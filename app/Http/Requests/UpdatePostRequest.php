@@ -22,10 +22,10 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|max:10' ,
-            'content' => 'sometimes' ,
-            'tags' => 'sometimes' ,
-            'is_visible' => 'sometimes'
+            'name' => 'required|max:10' ,
+            'content' => 'required' ,
+            'tags' => 'required' ,
+            'is_visible' => 'required'
         ];
     }
 }

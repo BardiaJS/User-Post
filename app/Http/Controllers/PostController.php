@@ -64,11 +64,20 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $validated = $request->validated();
-        $post->update($validated);
-        return response()->json([
-            'updated_data' => $post
-        ]);
+            if((Auth::user()->is_admin == 1) || (Auth::user()->is_super_admin == 1)){
+                $validated = $request->validated();
+                $post->update($validated);
+                return new PostResource($post);
+            }else{
+                $isChecked = (bool) ($post->user_id == Auth::user()->id);
+                if($isChecked){
+                    $validated = $request->validated();
+                    $post->update($validated);
+                    return new PostResource($post);
+                }else{
+                    abort (403 , "the post isn't yours");
+                }
+            }
     }
 
     /**
