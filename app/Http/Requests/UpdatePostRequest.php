@@ -25,7 +25,8 @@ class UpdatePostRequest extends FormRequest
             'name' => 'required|max:10' ,
             'content' => 'required' ,
             'tags' => 'required' ,
-            'is_visible' => 'required'
+            'is_visible' => 'required',
+            'is_admin' => 'sometimes'
         ];
     }
 }

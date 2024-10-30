@@ -51,25 +51,40 @@ class UserController extends Controller
 
     //show the user itself
     public function show(User $user){
-        
+
             return new UserResource( $user );
     }
 
 
     //update the user data
     public function update(UserUpdateRequest $request, User $user){
-        $validated = $request->validated();
         // $entered_pass = $validated->input('password');
-        if (empty($request->input('password'))) {
+        if(!empty($request['is_admin'])){
+            if(Auth::user()->is_super_admin == 1){
+                if(!empty($request['email'])){
+                    $gmailCheck = Auth::user()->gmail == $request['email'];
+                    if($gmailCheck){
+                        $validated = $request->validated();
+                        $user->update($validated);
+                        return new UserResource( $user );
+                    }else{
+                        abort(403,"You are not able to change the other users profile!");
+                    }
+                }else{
+                    $validated = $request->validated();
+                    $user->update($validated);
+                    return new UserResource( $user );
+                }
+            }else{
+                abort(403,"You are not allowed to do that!!");
+            }
+        }else{
+            $validated = $request->validated();
             $user->update($validated);
             return new UserResource( $user );
-        }else{
-            abort (403 , 'Not able to enter the password');
         }
 
-        }
-
-
+    }
 
     //show the profile
     public function profile(){
