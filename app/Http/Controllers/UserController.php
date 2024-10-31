@@ -59,31 +59,72 @@ class UserController extends Controller
     //update the user data
     public function update(UserUpdateRequest $request, User $user){
         // $entered_pass = $validated->input('password');
-        if(!empty($request['is_admin'])){
+        if(!empty($request['password'])){
+            abort(403 , "You can't change the password from here!");
+        }else{
             if(Auth::user()->is_super_admin == 1){
-                if(!empty($request['email'])){
-                    $gmailCheck = Auth::user()->gmail == $request['email'];
-                    if($gmailCheck){
-                        $validated = $request->validated();
-                        $user->update($validated);
-                        return new UserResource( $user );
-                    }else{
-                        abort(403,"You are not able to change the other users profile!");
+                if(Auth::user() == $user){
+                    if($request['is_admin'] == 0){
+                        abort(403 , "You can not change the 'is_admin' field to zero ! You are super_admin!!!");
                     }
                 }else{
-                    $validated = $request->validated();
-                    $user->update($validated);
-                    return new UserResource( $user );
-                }
-            }else{
-                abort(403,"You are not allowed to do that!!");
-            }
-        }else{
-            $validated = $request->validated();
-            $user->update($validated);
-            return new UserResource( $user );
-        }
+                        if(!empty($request['email'])){
+                            if($user->email == $request['email']){
+                                $validated = $request->validated();
+                                $user->email = $validated['email'];
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }else{
+                                $validated = $request->validated();
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }
+                        }
 
+                }
+
+            }else if(Auth::user()->is_admin == 1){
+                if(!empty($request['is_admin'])){
+                    if(!empty($request['email'])){
+                        if($user->email == $request['email']){
+                            $validated = $request->validated();
+                            $user->email = $validated['email'];
+                            $user->update($validated);
+                            return new UserResource( $user );
+                        }else{
+                            $validated = $request->validated();
+                            $user->update($validated);
+                            return new UserResource( $user );
+                        }
+                    }
+                }else{
+                    abort(403 , "You can't change the admin field for a user!");
+                }
+
+            }else {
+                if(!empty($request['is_admin'])){
+                    if(Auth::user() == $user){
+                        if(!empty($request['email'])){
+                            if($user->email == $request['email']){
+                                $validated = $request->validated();
+                                $user->email = $validated['email'];
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }else{
+                                $validated = $request->validated();
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }
+                        }
+                    }else{
+                            abort(403 , "you can't change other users profile!");
+                    }
+
+                }else{
+                    abort(403 , "You can't change the admin field for a user!");
+                }
+            }
+        }
     }
 
     //show the profile
@@ -120,4 +161,9 @@ class UserController extends Controller
             abort(403 , 'You cannot get access to this page');
         }
     }
+
+
+
+
+
 }
