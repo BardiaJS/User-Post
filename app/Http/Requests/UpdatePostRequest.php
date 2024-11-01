@@ -26,7 +26,7 @@ class UpdatePostRequest extends FormRequest
             'content' => 'required' ,
             'tags' => 'required' ,
             'is_visible' => 'required',
-            'is_admin' => 'sometimes'
+            
         ];
     }
 }
