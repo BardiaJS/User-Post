@@ -2,30 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserPasswordUpdateRequest;
-use App\Http\Requests\UserStoreRequest;
-use App\Http\Requests\UserUpdateRequest;
-use App\Http\Resources\UserCollection;
-use App\Http\Resources\UserResource;
+use Response;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Response;
+use App\Http\Resources\UserCollection;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\UserPasswordUpdateRequest;
 
 class UserController extends Controller
 {
     // function for register the user
 
     public function register(UserStoreRequest $request){
+        $uploadFolder = 'users';
         if(Auth::check()){
             if((Auth::user()->is_admin == 1) || (Auth::user() -> is_super_admin == 1)){
                 if($request['is_admin'] != null ){
-                    $validated = $request->validated();
-                    $validated['password'] = Hash::make($validated['password']);
-                    $user = User::create($validated);
-                    return new UserResource($user);
+                    if($request['avatar'] != null){
+                        $file = $request->file('image');
+                        $filename = uniqid() . "_" . $file->getClientOriginalName();
+                        $file->move(public_path('public/images'), $filename);
+                        $url = URL::to('/') . '/public/images/' . $filename;
+                        $validated = $request->validated();
+                        $validated['password'] = Hash::make($validated['password']);
+                        $validated['avatar'] = $url;
+                        $user = User::create($validated);
+                        return new UserResource($user);
+                    }else{
+                        $validated = $request->validated();
+                        $validated['password'] = Hash::make($validated['password']);
+                        $user = User::create($validated);
+                        return new UserResource($user);
+                    }
+
                 }else{
                     abort(403 , 'You are admin, you need to declare the user to be an admin or not!');
                 }
@@ -34,10 +49,22 @@ class UserController extends Controller
                 abort(403 ,'You cannot create a user');
             }
         }else{
-            $validated = $request->validated();
-            $validated['password'] = Hash::make($validated['password']);
-            $user = User::create($validated);
-            return new UserResource($user);
+            if($request['avatar'] != null){
+                $file = $request->file('image');
+                $filename = uniqid() . "_" . $file->getClientOriginalName();
+                $file->move(public_path('public/images'), $filename);
+                $url = URL::to('/') . '/public/images/' . $filename;
+                $validated = $request->validated();
+                $validated['password'] = Hash::make($validated['password']);
+                $validated['avatar'] = $url;
+                $user = User::create($validated);
+                return new UserResource($user);
+            }else{
+                $validated = $request->validated();
+                $validated['password'] = Hash::make($validated['password']);
+                $user = User::create($validated);
+                return new UserResource($user);
+            }
         }
     }
 
