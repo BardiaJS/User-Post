@@ -19,10 +19,26 @@ class UserController extends Controller
     // function for register the user
 
     public function register(UserStoreRequest $request){
-        $validated = $request->validated();
-        $validated['password'] = Hash::make($validated['password']);
-        $user = User::create($validated);
-        return new UserResource($user);
+        if(Auth::check()){
+            if((Auth::user()->is_admin == 1) || (Auth::user() -> is_super_admin == 1)){
+                if($request['is_admin'] != null ){
+                    $validated = $request->validated();
+                    $validated['password'] = Hash::make($validated['password']);
+                    $user = User::create($validated);
+                    return new UserResource($user);
+                }else{
+                    abort(403 , 'You are admin, you need to declare the user to be an admin or not!');
+                }
+
+            }else{
+                abort(403 ,'You cannot create a user');
+            }
+        }else{
+            $validated = $request->validated();
+            $validated['password'] = Hash::make($validated['password']);
+            $user = User::create($validated);
+            return new UserResource($user);
+        }
     }
 
     // function fore login the user
