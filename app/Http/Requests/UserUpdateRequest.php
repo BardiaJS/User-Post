@@ -27,7 +27,8 @@ class UserUpdateRequest extends FormRequest
                 'last_name'=> 'required|max:10',
                 'display_name' => 'required|max:10',
                 'email' => 'required|email' ,
-                'is_admin' =>'sometimes'
+                'is_admin' =>'sometimes' ,
+                'avatar' => 'required'
         ];
     }
 }

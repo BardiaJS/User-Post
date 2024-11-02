@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\UserStoreRequest;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserPasswordUpdateRequest;
 
@@ -25,13 +26,12 @@ class UserController extends Controller
             if((Auth::user()->is_admin == 1) || (Auth::user() -> is_super_admin == 1)){
                 if($request['is_admin'] != null ){
                     if($request['avatar'] != null){
-                        $file = $request->file('image');
-                        $filename = uniqid() . "_" . $file->getClientOriginalName();
-                        $file->move(public_path('public/images'), $filename);
-                        $url = URL::to('/') . '/public/images/' . $filename;
+                        $filName = time().$request->file('avatar')->getClientOriginalName();
+                        $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                        $requestData ["avatar"] = '/storage/'. $path;
                         $validated = $request->validated();
                         $validated['password'] = Hash::make($validated['password']);
-                        $validated['avatar'] = $url;
+                        $validated['avatar'] = $requestData["avatar"];
                         $user = User::create($validated);
                         return new UserResource($user);
                     }else{
@@ -50,13 +50,13 @@ class UserController extends Controller
             }
         }else{
             if($request['avatar'] != null){
-                $file = $request->file('image');
-                $filename = uniqid() . "_" . $file->getClientOriginalName();
-                $file->move(public_path('public/images'), $filename);
-                $url = URL::to('/') . '/public/images/' . $filename;
+
+                $filName = time().$request->file('avatar')->getClientOriginalName();
+                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                $requestData ["avatar"] = '/storage/'. $path;
                 $validated = $request->validated();
                 $validated['password'] = Hash::make($validated['password']);
-                $validated['avatar'] = $url;
+                $validated['avatar'] = $requestData["avatar"];
                 $user = User::create($validated);
                 return new UserResource($user);
             }else{
@@ -130,8 +130,15 @@ class UserController extends Controller
                 if(!empty($request['is_admin'])){
                     if(!empty($request['email'])){
                         if($user->email == $request['email']){
+
+                            $filName = time().$request->file('avatar')->getClientOriginalName();
+                            $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                            $oldAvatar = $user->avatar;
+                            Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                            $requestData ["avatar"] = '/storage/'. $path;
                             $validated = $request->validated();
                             $user->email = $validated['email'];
+                            $validated["avatar"] = $requestData['avatar'];
                             $user->update($validated);
                             return new UserResource( $user );
                         }else{
@@ -149,12 +156,24 @@ class UserController extends Controller
                     if(Auth::user() == $user){
                         if(!empty($request['email'])){
                             if($user->email == $request['email']){
+                                $filName = time().$request->file('avatar')->getClientOriginalName();
+                                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                                $oldAvatar = $user->avatar;
+                                Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                                $requestData ["avatar"] = '/storage/'. $path;
                                 $validated = $request->validated();
                                 $user->email = $validated['email'];
+                                $validated["avatar"] = $requestData["avatar"];
                                 $user->update($validated);
                                 return new UserResource( $user );
                             }else{
+                                $filName = time().$request->file('avatar')->getClientOriginalName();
+                                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                                $oldAvatar = $user->avatar;
+                                Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                                $requestData ["avatar"] = '/storage/'. $path;
                                 $validated = $request->validated();
+                                $validated["avatar"] = $requestData["avatar"];
                                 $user->update($validated);
                                 return new UserResource( $user );
                             }
