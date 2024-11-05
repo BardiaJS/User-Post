@@ -130,32 +130,7 @@ class UserController extends Controller
                 if(!empty($request['is_admin'])){
                     if(!empty($request['email'])){
                         if($user->email == $request['email']){
-
-                            $filName = time().$request->file('avatar')->getClientOriginalName();
-                            $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
-                            $oldAvatar = $user->avatar;
-                            Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
-                            $requestData ["avatar"] = '/storage/'. $path;
-                            $validated = $request->validated();
-                            $user->email = $validated['email'];
-                            $validated["avatar"] = $requestData['avatar'];
-                            $user->update($validated);
-                            return new UserResource( $user );
-                        }else{
-                            $validated = $request->validated();
-                            $user->update($validated);
-                            return new UserResource( $user );
-                        }
-                    }
-                }else{
-                    abort(403 , "You can't change the admin field for a user!");
-                }
-
-            }else {
-                if(!empty($request['is_admin'])){
-                    if(Auth::user() == $user){
-                        if(!empty($request['email'])){
-                            if($user->email == $request['email']){
+                            if($request['avatar'] != null){
                                 $filName = time().$request->file('avatar')->getClientOriginalName();
                                 $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
                                 $oldAvatar = $user->avatar;
@@ -163,27 +138,83 @@ class UserController extends Controller
                                 $requestData ["avatar"] = '/storage/'. $path;
                                 $validated = $request->validated();
                                 $user->email = $validated['email'];
-                                $validated["avatar"] = $requestData["avatar"];
+                                $validated["avatar"] = $requestData['avatar'];
                                 $user->update($validated);
                                 return new UserResource( $user );
                             }else{
+                                $validated = $request->validated();
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }
+                        }else{
+                            if($request['avatar'] != null){
                                 $filName = time().$request->file('avatar')->getClientOriginalName();
                                 $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
                                 $oldAvatar = $user->avatar;
                                 Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
                                 $requestData ["avatar"] = '/storage/'. $path;
                                 $validated = $request->validated();
-                                $validated["avatar"] = $requestData["avatar"];
+                                $user->email = $validated['email'];
+                                $validated["avatar"] = $requestData['avatar'];
+                                $user->update($validated);
+                                return new UserResource( $user );
+                            }else{
+                                $validated = $request->validated();
                                 $user->update($validated);
                                 return new UserResource( $user );
                             }
                         }
-                    }else{
-                            abort(403 , "you can't change other users profile!");
-                    }
-
                 }else{
                     abort(403 , "You can't change the admin field for a user!");
+                }
+
+                }else {
+                    if(!empty($request['is_admin'])){
+                        if(Auth::user() == $user){
+                            if(!empty($request['email'])){
+                                if($user->email == $request['email']){
+                                    if($request['avatar'] != null){
+                                        $filName = time().$request->file('avatar')->getClientOriginalName();
+                                        $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                                        $oldAvatar = $user->avatar;
+                                        Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                                        $requestData ["avatar"] = '/storage/'. $path;
+                                        $validated = $request->validated();
+                                        $user->email = $validated['email'];
+                                        $validated["avatar"] = $requestData["avatar"];
+                                        $user->update($validated);
+                                        return new UserResource( $user );
+                                    }else{
+                                        $validated = $request->validated();
+                                        $user->update($validated);
+                                        return new UserResource( $user );
+                                    }
+
+                                }else{
+                                    if($request["avatar"] != null){
+                                        $filName = time().$request->file('avatar')->getClientOriginalName();
+                                        $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                                        $oldAvatar = $user->avatar;
+                                        Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                                        $requestData ["avatar"] = '/storage/'. $path;
+                                        $validated = $request->validated();
+                                        $validated["avatar"] = $requestData["avatar"];
+                                        $user->update($validated);
+                                        return new UserResource( $user );
+                                    }else{
+                                        $validated = $request->validated();
+                                        $user->update($validated);
+                                        return new UserResource( $user );
+                                    }
+
+                                }
+                            }
+                        }else{
+                            abort(403 , "you can't change other users profile!");
+                        }
+                    }else{
+                        abort(403 , "You can't change the admin field for a user!");
+                    }
                 }
             }
         }

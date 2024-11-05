@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('content');
-            // $table->string(''); //maybe for thumbnail
+            $table->string('thumbnail')->nullable(); //maybe for thumbnail
             $table->string('tags');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

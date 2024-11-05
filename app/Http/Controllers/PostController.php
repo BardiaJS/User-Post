@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\PostCollection;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -42,12 +43,22 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        $validated = $request->validated();
-        $validated ['user_id'] = Auth::user()->id;
-        $post = Post::create($validated );
-        return response()->json([
-            'data' => $post
-        ]);
+        if($request['thumbnail'] != null){
+            $filName = time().$request->file('thumbnail')->getClientOriginalName();
+            $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
+            $requestData ["thumbnail"] = '/storage/'. $path;
+            $validated = $request->validated();
+            $validated ['user_id'] = Auth::user()->id;
+            $validated['thumbnail'] = $requestData["thumbnail"];
+            $post = Post::create($validated);
+            return new PostResource($post);
+        }else{
+            $validated = $request->validated();
+            $validated ['user_id'] = Auth::user()->id;
+            $post = Post::create($validated);
+            return new PostResource($post);
+        }
+
     }
 
     /**
@@ -66,14 +77,42 @@ class PostController extends Controller
     {
             if((Auth::user()->is_admin == 1) || (Auth::user()->is_super_admin == 1)){
                 $validated = $request->validated();
-                $post->update($validated);
-                return new PostResource($post);
-            }else{
-                $isChecked = (bool) ($post->user_id == Auth::user()->id);
-                if($isChecked){
+                if($request["thumbnail"] != null){
+                    $filName = time().$request->file('thumbnail')->getClientOriginalName();
+                    $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
+                    $oldThumbnail = $post->thumbnail;
+                    Storage::delete(str_replace("/storage/" , "public/" , $oldThumbnail));
+                    $requestData ["thumbnail"] = '/storage/'. $path;
+                    $validated = $request->validated();
+                    $validated["thumbnail"] = $requestData['thumbnail'];
+                    $post->update($validated);
+                    return new PostResource($post);
+                }else{
                     $validated = $request->validated();
                     $post->update($validated);
                     return new PostResource($post);
+                }
+
+
+
+            }else{
+                $isChecked = (bool) ($post->user_id == Auth::user()->id);
+                if($isChecked){
+                    if($request["thumbnail"] != null){
+                        $filName = time().$request->file('thumbnail')->getClientOriginalName();
+                        $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
+                        $oldThumbnail = $post->thumbnail;
+                        Storage::delete(str_replace("/storage/" , "public/" , $oldThumbnail));
+                        $requestData ["thumbnail"] = '/storage/'. $path;
+                        $validated = $request->validated();
+                        $validated["thumbnail"] = $requestData['thumbnail'];
+                        $post->update($validated);
+                        return new PostResource($post);
+                    }else{
+                        $validated = $request->validated();
+                        $post->update($validated);
+                        return new PostResource($post);
+                    }
                 }else{
                     abort (403 , "the post isn't yours");
                 }

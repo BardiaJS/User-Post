@@ -13,7 +13,8 @@ class Post extends Model
         'content' ,
         'tags' ,
         'is_visible',
-        'user_id'
+        'user_id' ,
+        'thumbnail'
     ];
 
     public function user(){
