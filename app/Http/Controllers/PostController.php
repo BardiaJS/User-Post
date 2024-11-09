@@ -77,7 +77,7 @@ class PostController extends Controller
     {
             if((Auth::user()->is_admin == 1) || (Auth::user()->is_super_admin == 1)){
                 $validated = $request->validated();
-                if($request["thumbnail"] != null){
+
                     $filName = time().$request->file('thumbnail')->getClientOriginalName();
                     $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
                     $oldThumbnail = $post->thumbnail;
@@ -87,18 +87,14 @@ class PostController extends Controller
                     $validated["thumbnail"] = $requestData['thumbnail'];
                     $post->update($validated);
                     return new PostResource($post);
-                }else{
-                    $validated = $request->validated();
-                    $post->update($validated);
-                    return new PostResource($post);
-                }
+
 
 
 
             }else{
                 $isChecked = (bool) ($post->user_id == Auth::user()->id);
                 if($isChecked){
-                    if($request["thumbnail"] != null){
+
                         $filName = time().$request->file('thumbnail')->getClientOriginalName();
                         $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
                         $oldThumbnail = $post->thumbnail;
@@ -108,11 +104,7 @@ class PostController extends Controller
                         $validated["thumbnail"] = $requestData['thumbnail'];
                         $post->update($validated);
                         return new PostResource($post);
-                    }else{
-                        $validated = $request->validated();
-                        $post->update($validated);
-                        return new PostResource($post);
-                    }
+
                 }else{
                     abort (403 , "the post isn't yours");
                 }
