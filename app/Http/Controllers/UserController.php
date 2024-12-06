@@ -15,6 +15,8 @@ use App\Http\Requests\UserStoreRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserPasswordUpdateRequest;
+use Tests\Unit\UserTest;
+
 
 class UserController extends Controller
 {
@@ -253,6 +255,8 @@ class UserController extends Controller
         }else{
             abort(403 , 'You cannot get access to this page');
         }
+
+        // $user = new UserTest();
     }
 
 
