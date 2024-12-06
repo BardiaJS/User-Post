@@ -11,9 +11,10 @@ class UpdateTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
+    public function test_update(): void
     {
-        $response = $this->put('/api/users' , ['first_name '=> 'Jaber' , 'last_name' => 'Fathollah' , 'display_name' => 'JB' , 'email' => 'jsardroodi@gmail.com' ,  '_token' => csrf_token()]);
+
+        $response = $this->put('/api/users/' , ['first_name '=> 'Jaber' , 'last_name' => 'Fathollah' , 'display_name' => 'JB' , 'email' => 'jsardroodi@gmail.com']);
         $response->assertStatus(201);
     }
 }
