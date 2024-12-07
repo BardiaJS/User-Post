@@ -26,7 +26,7 @@ class UserUpdateRequest extends FormRequest
                 'first_name' => 'required|max:10' ,
                 'last_name'=> 'required|max:10',
                 'display_name' => 'required|max:10',
-                'email' => 'required|email' ,
+                'email' => 'required|email|unique' ,
                 'is_admin' =>'sometimes' ,
                 'avatar' => 'required'
         ];

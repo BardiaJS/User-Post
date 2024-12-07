@@ -27,7 +27,7 @@ Route::post('login' , [UserController::class,'login']);
 Route::get('posts/index' , [PostController::class,'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users' , UserController::class)->only('show' , 'update' , 'index');
-    Route::apiResource('posts', PostController::class)->only('show' , 'update' , 'delete');
+    Route::apiResource('posts', PostController::class);
 
 });
 
