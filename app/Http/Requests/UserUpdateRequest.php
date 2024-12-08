@@ -23,12 +23,11 @@ class UserUpdateRequest extends FormRequest
     {
 
         return [
-                'first_name' => 'required|max:10' ,
-                'last_name'=> 'required|max:10',
-                'display_name' => 'required|max:10',
-                'email' => 'required|email|unique' ,
-                'is_admin' =>'sometimes' ,
-                'avatar' => 'required'
+            'first_name' => 'required|max:10' ,
+            'last_name'=> 'required|max:10',
+            'display_name' => 'required|max:10',
+            'email' => 'required|email|unique:users,email' ,
+            'is_admin' => 'sometimes|boolean' ,
         ];
     }
 }

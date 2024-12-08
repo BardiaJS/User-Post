@@ -23,49 +23,32 @@ class UserController extends Controller
     // function for register the user
 
     public function register(UserStoreRequest $request){
-        $uploadFolder = 'users';
         if(Auth::check()){
-            if((Auth::user()->is_admin == 1) || (Auth::user() -> is_super_admin == 1)){
-                if($request['is_admin'] != null ){
-                    if($request['avatar'] != null){
-                        $filName = time().$request->file('avatar')->getClientOriginalName();
-                        $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
-                        $requestData ["avatar"] = '/storage/'. $path;
-                        $validated = $request->validated();
-                        $validated['password'] = Hash::make($validated['password']);
-                        $validated['avatar'] = $requestData["avatar"];
-                        $user = User::create($validated);
-                        return new UserResource($user);
-                    }else{
-                        $validated = $request->validated();
-                        $validated['password'] = Hash::make($validated['password']);
-                        $user = User::create($validated);
-                        return new UserResource($user);
-                    }
-
+            if(Auth::user()->is_super_admin == 1){
+                $validated = $request->validated();
+                $validated['password'] = Hash::make($validated['password']);
+                $user = User::create($validated);
+                return new UserResource($user);
+            }else if(Auth::user()->is_admin == 1){
+                if(empty($request['is-admin']) || empty($request['is_super_admin'])){
+                    $validated = $request->validated();
+                    $validated['password'] = Hash::make($validated['password']);
+                    $user = User::create($validated);
+                    return new UserResource($user);
                 }else{
-                    abort(403 , 'You are admin, you need to declare the user to be an admin or not!');
+                    abort(403 , "You cannot set a user as a admin! You don't have permission to do that!");
                 }
-
             }else{
-                abort(403 ,'You cannot create a user');
+                abort(403 , "You are a user, You cannot register a user");
             }
         }else{
-            if($request['avatar'] != null){
-
-                $filName = time().$request->file('avatar')->getClientOriginalName();
-                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
-                $requestData ["avatar"] = '/storage/'. $path;
+            if(empty($request['is-admin']) || empty($request['is_super_admin'])){
                 $validated = $request->validated();
                 $validated['password'] = Hash::make($validated['password']);
-                $validated['avatar'] = $requestData["avatar"];
                 $user = User::create($validated);
                 return new UserResource($user);
             }else{
-                $validated = $request->validated();
-                $validated['password'] = Hash::make($validated['password']);
-                $user = User::create($validated);
-                return new UserResource($user);
+                abort(403 , "You cannot set a user as a admin! You don't have permission to do that!");
             }
         }
     }
@@ -107,7 +90,7 @@ class UserController extends Controller
             abort(403 , "You can't change the password from here!");
         }else{
             if(Auth::user()->is_super_admin == 1){
-                if(Auth::user() == $user){
+                if(Auth::user()->id == $user->id){
                     if(($request['is_super_admin'] == 0) || ($request['is_admin'] == 0)){
                         abort(403 , "You can not change the 'is_admin' field to zero ! You are super_admin!!!");
                     }else{
@@ -118,9 +101,10 @@ class UserController extends Controller
                             Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
                             $requestData ["avatar"] = '/storage/'. $path;
                             $validated = $request->validated();
-                            $user->email = $validated['email'];
+                            // $user->email = $validated['email'];
                             $validated["avatar"] = $requestData['avatar'];
                             $user->update($validated);
+
                             return new UserResource( $user );
                         }else{
                             $validated = $request->validated();
@@ -150,7 +134,7 @@ class UserController extends Controller
                 if(!empty($request['is_super_admin']) || !empty($request['is_admin'])){
                     abort(403 , "You don't have access to edit this part");
                 }else{
-                    if(Auth::user() == $user){
+                    if(Auth::user()->id == $user->id){
                         if($request['avatar'] != null){
                             $filName = time().$request->file('avatar')->getClientOriginalName();
                             $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
@@ -190,7 +174,7 @@ class UserController extends Controller
                 if(!empty($request['is_super_admin']) || !empty($request['is_admin'])){
                     abort(403 , "You don't have access to edit this part");
                 }else{
-                    if(Auth::user() == $user){
+                    if(Auth::user()->id == $user->id){
                         if($request['avatar'] != null){
                             $filName = time().$request->file('avatar')->getClientOriginalName();
                             $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');

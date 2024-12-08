@@ -27,7 +27,8 @@ class UserStoreRequest extends FormRequest
             'display_name' => 'required|max:10',
             'email' => 'required|email|unique:users,email' ,
             'password' => 'required|confirmed|min:6' ,
-            'avatar'=> 'nullable|image:jpeg,png,jpg,gif,svg|max:2048',
+            'is_admin' => 'sometimes|boolean' ,
+
         ];
     }
 }
