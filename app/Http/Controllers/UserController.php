@@ -5,17 +5,18 @@ namespace App\Http\Controllers;
 use Response;
 use Carbon\Carbon;
 use App\Models\User;
+use Tests\Unit\UserTest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
+use App\Http\Requests\AddAvatarRequest;
 use App\Http\Requests\UserStoreRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserPasswordUpdateRequest;
-use Tests\Unit\UserTest;
 
 
 class UserController extends Controller
@@ -49,6 +50,39 @@ class UserController extends Controller
                 return new UserResource($user);
             }else{
                 abort(403 , "You cannot set a user as a admin! You don't have permission to do that!");
+            }
+        }
+    }
+
+    // function for add the avatar
+    public function addAvatar(AddAvatarRequest $addAvatarRequest , User $user){
+        if(Auth::user()->is_super_admin == 1){
+            $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+            $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+            $requestData ["avatar"] = '/storage/'. $path;
+            $validated = $addAvatarRequest->validated();
+            $validated['avatar'] = $requestData["avatar"];
+            $user -> update($validated);
+            return new UserResource($user);
+        }else if (Auth::user()->is_admin == 1){
+            $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+            $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+            $requestData ["avatar"] = '/storage/'. $path;
+            $validated = $addAvatarRequest->validated();
+            $validated['avatar'] = $requestData["avatar"];
+            $user -> update($validated);
+            return new UserResource($user);
+        }else{
+            if(Auth::user()->id == $user->id){
+                $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+                $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+                $requestData ["avatar"] = '/storage/'. $path;
+                $validated = $addAvatarRequest->validated();
+                $validated['avatar'] = $requestData["avatar"];
+                $user -> update($validated);
+                return new UserResource($user);
+            }else{
+                abort(403 , "You can't set a profile to other users!");
             }
         }
     }
