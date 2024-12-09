@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserStoreRequest extends FormRequest
@@ -27,8 +28,7 @@ class UserStoreRequest extends FormRequest
             'display_name' => 'required|max:10',
             'email' => 'required|email|unique:users,email' ,
             'password' => 'required|confirmed|min:6' ,
-            'is_admin' => 'sometimes|boolean' ,
-
-        ];
+            'is_admin' => 'sometimes|required'
+         ];
     }
 }

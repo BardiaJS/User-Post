@@ -24,9 +24,10 @@ Route::get('users/me' , [UserController::class,'profile'])->middleware('auth:san
 // change password endpoint
 Route::post('users/change-password' , [UserController::class,'changePassword'])->middleware('auth:sanctum');
 // register endpoint
-Route::post('register' , [UserController::class,'register']);
+Route::middleware('auth:sanctum')->post('register', [UserController::class , 'register']);
 // login endpoint
 Route::post('login' , [UserController::class,'login']);
+
 //add avatar endpoint
 Route::post('users/add-avatar' , [UserController::class , 'addAvatar'])->middleware('auth:sanctum');
 
