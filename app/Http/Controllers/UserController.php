@@ -6,13 +6,14 @@ use Response;
 use Carbon\Carbon;
 use App\Models\User;
 use Tests\Unit\UserTest;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\AddAvatarRequest;
+use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserStoreRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserUpdateRequest;
@@ -24,36 +25,32 @@ class UserController extends Controller
     // function for register the user
 
     public function register(UserStoreRequest $request){
-
-
-        if(Auth::check()){
-            $is_auth_check = auth()->check();
-            return response()->json([
-                "is_auth_checked" => $is_auth_check
-            ]);
-            // if((Auth::user()->is_super_admin == 1) ){
-            //     $request['is_admin']->required;
-            //     $validated = $request->validated();
-            //     $validated['password'] = Hash::make($validated['password']);
-            //     $user = User::create($validated);
-            //     return new UserResource($user);
-            // }else if(Auth::user()->is_admin == 1){
-            //     $request['is_admin'] = 0;
-            //     $validated = $request->validated();
-            //     $validated['password'] = Hash::make($validated['password']);
-            //     $user = User::create($validated);
-            //     return new UserResource($user);
-            // }else{
-            //     abort (403 , "You cannot permission to create a user!");
-            // }
-
+        $token= request()->bearerToken();
+        // if user has bearer token it means he logged in
+        if($token){
+            $is_super_admin = auth('sanctum')->user()->is_super_admin;
+            $is_admin = auth('sanctum')->user()->is_admin;
+            if($is_super_admin == 1){
+                $validated = $request->validated();
+                $user = User::create($validated);
+                return new UserResource($user);
+            }else if($is_admin){
+                $validated = $request->validated();
+                $validated['is_admin'] = 0;
+                $user = User::create($validated);
+                return new UserResource($user);
+            }else{
+                abort (403 , "You don't have an access");
+            }
         }else{
-            $is_auth_check = auth()->check();
-            return response()->json([
-                "is_auth_checked" => $is_auth_check
-            ]);
 
+                $validated = $request->validated();
+                $validated['is_admin'] = 0;
+                $user = User::create($validated);
+                return new UserResource($user);
         }
+
+
     }
 
     // function for add the avatar
@@ -90,12 +87,8 @@ class UserController extends Controller
     }
 
     // function fore login the user
-    public function login(Request $request){
-        $validated = $request->validate([
-            'email' => 'required|email' ,
-            'password' => 'required'
-        ]);
-
+    public function login(UserLoginRequest $request){
+        $validated = $request->validated();
         if(! Auth::attempt($validated)){
             return response()->json([
                 'message' => 'login information is incorrect!'

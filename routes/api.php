@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +25,7 @@ Route::get('users/me' , [UserController::class,'profile'])->middleware('auth:san
 // change password endpoint
 Route::post('users/change-password' , [UserController::class,'changePassword'])->middleware('auth:sanctum');
 // register endpoint
-Route::middleware('auth:sanctum')->post('register', [UserController::class , 'register']);
+Route::post('register' , [UserController::class , 'register']);
 // login endpoint
 Route::post('login' , [UserController::class,'login']);
 
