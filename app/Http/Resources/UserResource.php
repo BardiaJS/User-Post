@@ -14,12 +14,7 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request)
     {
-        $is_admin = 0;
-        if($this->is_admin == true){
-            $is_admin = 1;
-        }else{
-            $is_admin = 0;
-        }
+
 
         return [
             'id'=> $this->id,
@@ -29,7 +24,7 @@ class UserResource extends JsonResource
             'avatar'=> $this->avatar,
             'email'=> $this->email,
             'lastEntry' => $this->last_entry,
-            'isAdmin' => $is_admin
+            'isAdmin' => $this->is_admin
         ];
     }
 }

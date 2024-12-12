@@ -115,11 +115,27 @@ class UserController extends Controller
 
     //update the user data
     public function update(UserUpdateRequest $request, User $user){
-        if(!empty($request['password'])){
-            abort(403 , "You can't change the password from here!");
-        }else{
-
-        }
+            $is_super_admin = auth('sanctum')->user()->is_super_admin;
+            $is_admin = auth('sanctum')->user()->is_admin;
+            if($is_super_admin == 1 or $is_admin == 1){
+                $request['is_admin'] = 'required';
+                $password = auth('sanctum')->user()->password;
+                $validated = $request->validated();
+                $validated['password'] = Hash::make('password');
+                $user->update($validated);
+                return new UserResource($user);
+            }else{
+                if(auth('sanctum')->user()->id == $user->id){
+                    $password = auth('sanctum')->user()->password;
+                    $validated = $request->validated();
+                    $validated['password'] = Hash::make($password);
+                    $validated['is_admin'] = 0;
+                    $user->update($validated);
+                    return new UserResource($user);
+                }else{
+                    abort (403 , "You don't have an access");
+                }
+            }
     }
 
     //show the profile
@@ -141,10 +157,6 @@ class UserController extends Controller
                 $user->update($validated);
                 return new UserResource( $user );
             }
-
-
-
-
     }
 
     public function index(){

@@ -22,16 +22,27 @@ class UserStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        $is_super_admin = auth('sanctum')->user()->is_super_admin;
-        if($is_super_admin){
-            return [
-                'first_name' => 'required|max:10' ,
-                'last_name' => 'required|max:10' ,
-                'display_name' =>'required|max:10' ,
-                'email' => 'required|email|unique:users,email' ,
-                'password' =>'required|min:6',
-                'is_admin' => 'required|boolean'
-            ];
+        $token= request()->bearerToken();
+        if($token){
+            if(auth('sanctum')->user()->is_super_admin == 0 ){
+                return [
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'password' =>'required|min:6',
+                    'is_admin' => 'sometimes|boolean'
+                ];
+            }else{
+                return [
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'password' =>'required|min:6',
+                    'is_admin' => 'reqiured|boolean'
+                ];
+            }
         }else{
             return [
                 'first_name' => 'required|max:10' ,
@@ -42,7 +53,6 @@ class UserStoreRequest extends FormRequest
                 'is_admin' => 'sometimes|boolean'
             ];
         }
-
 
     }
 

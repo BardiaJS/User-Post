@@ -22,12 +22,24 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
 
-        return [
-            'first_name' => 'required|max:10' ,
-            'last_name'=> 'required|max:10',
-            'display_name' => 'required|max:10',
-            'email' => 'required|email|unique:users,email' ,
-            'is_admin' => 'sometimes|boolean' ,
-        ];
+
+            if(auth('sanctum')->user()->is_super_admin == 0){
+                return [
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'is_admin' => 'sometimes|boolean'
+                ];
+            }else{
+                return [
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'is_admin' => 'reqiured|boolean'
+                ];
+            }
+        }
     }
-}
+
