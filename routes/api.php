@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // show the profile of the user
 Route::get('users/me' , [UserController::class,'profile'])->middleware('auth:sanctum');
 // change password endpoint
-Route::post('users/change-password' , [UserController::class,'changePassword'])->middleware('auth:sanctum');
+Route::post('users/change-password/{user}' , [UserController::class,'changePassword'])->middleware('auth:sanctum');
 // register endpoint
 Route::post('register' , [UserController::class , 'register']);
 // login endpoint

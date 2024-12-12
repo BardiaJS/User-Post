@@ -21,9 +21,12 @@ class UserPasswordUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+
+
+
         return [
             'password' => 'required' ,
-            'new_password' => 'sometimes|min:6|different:password' 
+            'new_password' => 'required_without_all|min:6|different:password'
         ];
     }
 }

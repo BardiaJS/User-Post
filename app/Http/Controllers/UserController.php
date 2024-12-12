@@ -147,16 +147,30 @@ class UserController extends Controller
             abort(403 , "no founding the user");
     }
 
-    public function changePassword(UserPasswordUpdateRequest $request){
+    public function changePassword(UserPasswordUpdateRequest $request , User $user){
+
+        $is_super_admin = auth('sanctum')->user()->is_super_admin;
+        $is_admin = auth('sanctum')->user()->is_admin;
+        if($is_super_admin == 1 or $is_admin == 1){
             $validated = $request->validated();
-            $isCheck =(bool) $validated['password'] == Auth::user()->password;
-            if($isCheck){
-                $validated['password'] = Hash::make($validated['password']);
-                $validated['password'] = $validated['new_password'];
-                $user = User::where('email' , Auth::user()->email)->first();
-                $user->update($validated);
-                return new UserResource( $user );
+            $validated['password'] = Hash::make($validated['new_password']);
+            $user->update($validated);
+            return new UserResource($user);
+        }else{
+            if(auth('sanctum')->user()->id == $user->id){
+
+                $validated = $request->validated();
+                $isCheck =(bool) $validated['password'] == Auth::user()->password;
+                if($isCheck){
+                    $validated['password'] = Hash::make($validated['new_password']);
+                    $user->update($validated);
+                    return new UserResource($user);
+                }
+            }else{
+                abort (403 , "You don't have an access");
             }
+        }
+
     }
 
     public function index(){
