@@ -40,7 +40,7 @@ class UserStoreRequest extends FormRequest
                     'display_name' =>'required|max:10' ,
                     'email' => 'required|email|unique:users,email' ,
                     'password' =>'required|min:6',
-                    'is_admin' => 'reqiured|boolean'
+                    'is_admin' => 'required|boolean'
                 ];
             }
         }else{
