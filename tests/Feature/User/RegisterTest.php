@@ -16,7 +16,7 @@ class RegisterTest extends TestCase
      //register test
     public function test_register(): void
     {
-        $response = $this->post('/api/register' , ['first_name' => 'Bardia' , 'last_name' => 'Jahanbini' , 'display_name' => 'BardiaJhs' , 'email' => 'bsardroodi@gmail.com' , 'password' => 'bardia1382' , 'password_confirmation' => 'bardia1382']);
+        $response = $this->post('api/register' , ['first_name' => 'Bardia' , 'last_name' => 'Jahanbini' , 'display_name' => 'BardiaJhs' , 'email' => 'bsardroodi@gmail.com' , 'password' => 'bardia1382' , 'is_admin' => 'true']);
         $response->assertStatus(201);
         // User::where('email' , 'bsardroodi@gmail.com')->delete();
     }

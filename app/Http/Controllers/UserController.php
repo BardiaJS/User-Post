@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\UserCollection;
 use App\Http\Requests\AddAvatarRequest;
+use App\Http\Requests\UpdateAvatarRequest;
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserStoreRequest;
 use Illuminate\Support\Facades\Storage;
@@ -181,9 +182,41 @@ class UserController extends Controller
         }else{
             abort(403 , 'You cannot get access to this page');
         }
-
-        // $user = new UserTest();
     }
+
+
+    public function updateAvatar(UpdateAvatarRequest $request , User $user){
+        $is_super_admin = Auth::user()->is_super_admin;
+        $is_admin = Auth::user()->is_admin;
+        if($is_super_admin or $is_admin){
+            $validated = $request->validated();
+            $filName = time().$request->file('avatar')->getClientOriginalName();
+            $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+            $oldAvatar = $user->avatar;
+            Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+            $validated ["avatar"] = '/storage/'. $path;
+            $user->avatar = $validated['avatar'];
+            $user->update();
+        }else{
+            if(Auth::user()->id == $user-> id){
+                $validated = $request->validated();
+                $filName = time().$request->file('avatar')->getClientOriginalName();
+                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                $oldAvatar = $user->avatar;
+                Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                $validated ["avatar"] = '/storage/'. $path;
+                $user->avatar = $validated['avatar'];
+                $user->update();
+            }else{
+                abort(403 , "You don't have permission to do that!!");
+            }
+        }
+
+    }
+
+
+
+
 
 
 
