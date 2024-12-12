@@ -31,6 +31,7 @@ class UserController extends Controller
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
             if($is_super_admin == 1){
+                $request['is_admin'] = 'required';
                 $validated = $request->validated();
                 $user = User::create($validated);
                 return new UserResource($user);

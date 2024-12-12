@@ -22,15 +22,27 @@ class UserStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        
-        return [
-            'first_name' => 'required|max:10' ,
-            'last_name' => 'required|max:10' ,
-            'display_name' =>'required|max:10' ,
-            'email' => 'required|email|unique:users,email' ,
-            'password' =>'required|min:6',
-            'is_admin' => 'sometimes|boolean'
-        ];
+        $is_super_admin = auth('sanctum')->user()->is_super_admin;
+        if($is_super_admin){
+            return [
+                'first_name' => 'required|max:10' ,
+                'last_name' => 'required|max:10' ,
+                'display_name' =>'required|max:10' ,
+                'email' => 'required|email|unique:users,email' ,
+                'password' =>'required|min:6',
+                'is_admin' => 'required|boolean'
+            ];
+        }else{
+            return [
+                'first_name' => 'required|max:10' ,
+                'last_name' => 'required|max:10' ,
+                'display_name' =>'required|max:10' ,
+                'email' => 'required|email|unique:users,email' ,
+                'password' =>'required|min:6',
+                'is_admin' => 'sometimes|boolean'
+            ];
+        }
+
 
     }
 
