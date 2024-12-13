@@ -38,12 +38,9 @@ class PostController extends Controller
 
                 $merged = $public_posts->merge($private_admin_posts);
                 $posts = $merged->all();
-                foreach($posts as $post){
-                    return new PostResource($post);
-                }
+                return new PostCollection($posts);
             }else{
                 $public_posts = Post::where('is_visible' , 1)->get();
-
                 $currentUserId = Auth::id();
 
                // Fetch posts where user_id is the current user's id and is_visible is 0
@@ -53,17 +50,12 @@ class PostController extends Controller
 
                 $merged = $public_posts->merge($private_admin_posts);
                 $posts = $merged->all();
-                foreach($posts as $post){
-                    return new PostResource($post);
-                }
+                return new PostCollection($posts);
             }
 
         }else{
             $public_posts = Post::where('is_visible' , 1)->get();
-            foreach($public_posts as $post){
-                return new PostResource($post);
-            }
-
+            return new PostCollection($public_posts);
         }
     }
 
