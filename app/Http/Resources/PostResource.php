@@ -22,13 +22,19 @@ class PostResource extends JsonResource
         $string_array_tags = [];
         $string_array_tags[] = $request['tags'];
 
+        $is_visible = false;
+        if($this->is_visible == true){
+            $is_visible = true;
+        }else{
+            $is_visible = false;
+        }
 
 
         return [
             'name' => $this->name,
             'content' => $this->content ,
             'tags' => $string_array_tags,
-            'isVisible' =>$this->is_visible,
+            'isVisible' =>$is_visible,
             'user_id' => $this->user->id
         ];
     }

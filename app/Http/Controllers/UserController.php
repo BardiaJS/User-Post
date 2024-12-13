@@ -31,14 +31,14 @@ class UserController extends Controller
         if($token){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
-            if($is_super_admin == 1){
+            if($is_super_admin == true){
                 // $request['is_admin'] = 'required';
                 $validated = $request->validated();
                 $user = User::create($validated);
                 return new UserResource($user);
             }else if($is_admin){
                 $validated = $request->validated();
-                $validated['is_admin'] = 0;
+                $validated['is_admin'] = false;
                 $user = User::create($validated);
                 return new UserResource($user);
             }else{
@@ -47,7 +47,7 @@ class UserController extends Controller
         }else{
 
                 $validated = $request->validated();
-                $validated['is_admin'] = 0;
+                $validated['is_admin'] = false;
                 $user = User::create($validated);
                 return new UserResource($user);
         }
@@ -57,7 +57,7 @@ class UserController extends Controller
 
     // function for add the avatar
     public function addAvatar(AddAvatarRequest $addAvatarRequest , User $user){
-        if(Auth::user()->is_super_admin == 1){
+        if(Auth::user()->is_super_admin == true){
             $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
             $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
             $requestData ["avatar"] = '/storage/'. $path;
@@ -65,7 +65,7 @@ class UserController extends Controller
             $validated['avatar'] = $requestData["avatar"];
             $user -> update($validated);
             return new UserResource($user);
-        }else if (Auth::user()->is_admin == 1){
+        }else if (Auth::user()->is_admin == true){
             $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
             $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
             $requestData ["avatar"] = '/storage/'. $path;
@@ -118,7 +118,7 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, User $user){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
-            if($is_super_admin == 1){
+            if($is_super_admin == true){
                 $request['is_admin'] = 'required';
                 $password = auth('sanctum')->user()->password;
                 $validated = $request->validated();
@@ -126,7 +126,7 @@ class UserController extends Controller
                 $user->update($validated);
                 return new UserResource($user);
             }else if($is_admin){
-                if($user->is_super_admin != 1 and $user->is_admin != 1){
+                if($user->is_super_admin ==false and $user->is_admin == false){
                     $request['is_admin'] = 'required';
                     $password = auth('sanctum')->user()->password;
                     $validated = $request->validated();
@@ -139,7 +139,7 @@ class UserController extends Controller
                     $password = auth('sanctum')->user()->password;
                     $validated = $request->validated();
                     $validated['password'] = Hash::make($password);
-                    $validated['is_admin'] = 0;
+                    $validated['is_admin'] = false;
                     $user->update($validated);
                     return new UserResource($user);
                 }else{
@@ -161,7 +161,7 @@ class UserController extends Controller
 
         $is_super_admin = auth('sanctum')->user()->is_super_admin;
         $is_admin = auth('sanctum')->user()->is_admin;
-        if($is_super_admin == 1 or $is_admin == 1){
+        if($is_super_admin == true or $is_admin == true){
             $validated = $request->validated();
             $validated['password'] = Hash::make($validated['new_password']);
             $user->update($validated);
@@ -186,7 +186,7 @@ class UserController extends Controller
     public function index(){
         $user = Auth::user();
 
-        if(($user->is_super_admin == 1) || ($user->is_admin == 1)){
+        if(($user->is_super_admin == true) || ($user->is_admin == true)){
             return new UserCollection(User::paginate());
         }else{
             abort(403 , 'You cannot get access to this page');
@@ -216,7 +216,7 @@ class UserController extends Controller
                 $validated ["avatar"] = '/storage/'. $path;
                 $user->avatar = $validated['avatar'];
                 $user->update();
-            }else if($user->is_super_admin == 0 and $user->is_admin == 0){
+            }else if($user->is_super_admin == false and $user->is_admin == false){
                 $validated = $request->validated();
                 $filName = time().$request->file('avatar')->getClientOriginalName();
                 $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');

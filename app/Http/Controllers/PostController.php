@@ -24,28 +24,28 @@ class PostController extends Controller
         if($token){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
-            if($is_super_admin == 1){
+            if($is_super_admin == true){
                 return new PostCollection(Post::paginate());
             }else if($is_admin){
-                $public_posts = Post::where('is_visible' , 1)->get();
+                $public_posts = Post::where('is_visible' , true)->get();
 
                 $currentUserId = Auth::id();
 
                // Fetch posts where user_id is the current user's id and is_visible is 0
                 $private_admin_posts = Post::where('user_id', $currentUserId)
-                            ->where('is_visible', 0)
+                            ->where('is_visible', false)
                             ->get();
 
                 $merged = $public_posts->merge($private_admin_posts);
                 $posts = $merged->all();
                 return new PostCollection($posts);
             }else{
-                $public_posts = Post::where('is_visible' , 1)->get();
+                $public_posts = Post::where('is_visible' , true)->get();
                 $currentUserId = Auth::id();
 
                // Fetch posts where user_id is the current user's id and is_visible is 0
                 $private_admin_posts = Post::where('user_id', $currentUserId)
-                            ->where('is_visible', 0)
+                            ->where('is_visible', false)
                             ->get();
 
                 $merged = $public_posts->merge($private_admin_posts);
@@ -54,7 +54,7 @@ class PostController extends Controller
             }
 
         }else{
-            $public_posts = Post::where('is_visible' , 1)->get();
+            $public_posts = Post::where('is_visible' , true)->get();
             return new PostCollection($public_posts);
         }
     }
@@ -72,7 +72,7 @@ class PostController extends Controller
 
 
     public function addThumbnail(AddThumbnailRequest $request , Post $post){
-        if(Auth::user()->is_super_admin == 1){
+        if(Auth::user()->is_super_admin == true){
             $filName = time().$request->file('avatar')->getClientOriginalName();
             $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
             $requestData ["thumbnail"] = '/storage/'. $path;
@@ -80,7 +80,7 @@ class PostController extends Controller
             $validated['thumbnail'] = $requestData["thumbnail"];
             $post -> update($validated);
             return new PostResource($post);
-        }else if (Auth::user()->is_admin == 1){
+        }else if (Auth::user()->is_admin == true){
             $filName = time().$request->file('thumbnail')->getClientOriginalName();
             $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
             $requestData ["thumbnail"] = '/storage/'. $path;
@@ -113,10 +113,10 @@ class PostController extends Controller
         if($token){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
-            if($is_super_admin == 1){
+            if($is_super_admin == true){
                 return new PostResource($post);
             }else if($is_admin){
-                if($post->is_visible == 1){
+                if($post->is_visible == true){
                     return new PostResource($post);
                 }else if($post->user_id = Auth::user()->id){
                     return new PostResource($post);
@@ -124,7 +124,7 @@ class PostController extends Controller
                     abort(403 , "You are not able to see this post");
                 }
             }else{
-                if($post->is_visible == 1){
+                if($post->is_visible == true){
                     return new PostResource($post);
                 }else if($post->user_id = Auth::user()->id){
                     return new PostResource($post);
@@ -133,7 +133,7 @@ class PostController extends Controller
                 }
             }
         }else{
-            if($post->is_visible == 1){
+            if($post->is_visible == true){
                 return new PostResource($post);
             }
         }
@@ -146,15 +146,15 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        if(Auth::user()->is_super_admin == 1){
+        if(Auth::user()->is_super_admin == true){
             $validated = $request->validated();
             $post->update($validated);
-        }else if(Auth::user()->is_admin == 1){
+        }else if(Auth::user()->is_admin == true){
             if($post->user_id = Auth::user()->id){
                 $validated = $request->validated();
                 $post->update($validated);
             }else{
-                if($post->user->is_admin != 0 and $post->user->is_super_admin != 0){
+                if($post->user->is_admin == true and $post->user->is_super_admin ==true){
                     $validated = $request->validated();
                     $post->update($validated);
                 }else{
@@ -193,7 +193,7 @@ class PostController extends Controller
                 $validated ["thumbnail"] = '/storage/'. $path;
                 $post->thumbnail = $validated['thumbnail'];
                 $post->update();
-            }else if($post->user->is_super_admin == 0 and $post->user->is_admin == 0){
+            }else if($post->user->is_super_admin == false and $post->user->is_admin == false){
                 $validated = $request->validated();
                 $filName = time().$request->file('thumbnail')->getClientOriginalName();
                 $path = $request->file('thumbnail')->storeAs('thumbnails' , $filName , 'public');
@@ -226,11 +226,11 @@ class PostController extends Controller
      */
     public function destroy(Post $post){
 
-        if((Auth::user()->is_super_admin == 1)){
+        if((Auth::user()->is_super_admin == true)){
             $post->delete();
             return response()->noContent();
-        }else if (Auth::user()->is_admin == 1){
-            if(($post->user_id == Auth::user()->id) || (($post->user->is_admin == 0) and ($post->user->is_super_admin == 0))){
+        }else if (Auth::user()->is_admin == true){
+            if(($post->user_id == Auth::user()->id) || (($post->user->is_admin == false) and ($post->user->is_super_admin == false))){
                 $post->delete();
                 return response()->noContent();
             }else{

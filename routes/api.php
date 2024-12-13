@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // post related routes
 // show the all of the post : if it is admin => see all of the post / if it is user => see his/her posts
-Route::get('posts/index' , [PostController::class,'index']);
+Route::get('posts/index' , [PostController::class,'index']); //done
 // creating the post for user
 Route::post('posts' , [PostController::class , 'store'])->middleware('auth:sanctum'); //done!
 // add thumbnail for user posts
@@ -53,7 +53,7 @@ Route::post('posts/change-thumbnail/{post}' , [PostController::class , 'changeTh
 // update the post details
 Route::put('posts/{post}' , [PostController::class , 'update'])->middleware('auth:sanctum'); // done!
 // show specific post
-Route::get('/posts/{post}' , [PostController::class , 'show'])->middleware('auth:sanctum');
+Route::get('/posts/{post}' , [PostController::class , 'show'])->middleware('auth:sanctum'); // done
 // delet the post
 Route::delete('posts/{post}' , [PostController::class , 'destroy']) ->middleware('auth:sanctum'); //done!
 
