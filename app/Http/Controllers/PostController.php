@@ -19,13 +19,53 @@ class PostController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->is_super_admin == 1){
-            return new PostCollection(Post::paginate());
-        }else if(Auth::user()->is_admin == 1){
-            
+        $token= request()->bearerToken();
+        // if user has bearer token it means he logged in
+        if($token){
+            $is_super_admin = auth('sanctum')->user()->is_super_admin;
+            $is_admin = auth('sanctum')->user()->is_admin;
+            if($is_super_admin == 1){
+                return new PostCollection(Post::paginate());
+            }else if($is_admin){
+                $public_posts = Post::where('is_visible' , 1)->get();
+
+                $currentUserId = Auth::id();
+
+               // Fetch posts where user_id is the current user's id and is_visible is 0
+                $private_admin_posts = Post::where('user_id', $currentUserId)
+                            ->where('is_visible', 0)
+                            ->get();
+
+                $merged = $public_posts->merge($private_admin_posts);
+                $posts = $merged->all();
+                foreach($posts as $post){
+                    return new PostResource($post);
+                }
+            }else{
+                $public_posts = Post::where('is_visible' , 1)->get();
+
+                $currentUserId = Auth::id();
+
+               // Fetch posts where user_id is the current user's id and is_visible is 0
+                $private_admin_posts = Post::where('user_id', $currentUserId)
+                            ->where('is_visible', 0)
+                            ->get();
+
+                $merged = $public_posts->merge($private_admin_posts);
+                $posts = $merged->all();
+                foreach($posts as $post){
+                    return new PostResource($post);
+                }
+            }
+
+        }else{
+            $public_posts = Post::where('is_visible' , 1)->get();
+            foreach($public_posts as $post){
+                return new PostResource($post);
+            }
+
         }
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -76,6 +116,35 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $token= request()->bearerToken();
+        // if user has bearer token it means he logged in
+        if($token){
+            $is_super_admin = auth('sanctum')->user()->is_super_admin;
+            $is_admin = auth('sanctum')->user()->is_admin;
+            if($is_super_admin == 1){
+                return new PostResource($post);
+            }else if($is_admin){
+                if($post->is_visible == 1){
+                    return new PostResource($post);
+                }else if($post->user_id = Auth::user()->id){
+                    return new PostResource($post);
+                }else{
+                    abort(403 , "You are not able to see this post");
+                }
+            }else{
+                if($post->is_visible == 1){
+                    return new PostResource($post);
+                }else if($post->user_id = Auth::user()->id){
+                    return new PostResource($post);
+                }else{
+                    abort(403 , "You are not able to see this post");
+                }
+            }
+        }else{
+            if($post->is_visible == 1){
+                return new PostResource($post);
+            }
+        }
 
     }
 
