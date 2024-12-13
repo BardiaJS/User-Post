@@ -118,13 +118,22 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, User $user){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
-            if($is_super_admin == 1 or $is_admin == 1){
+            if($is_super_admin == 1){
                 $request['is_admin'] = 'required';
                 $password = auth('sanctum')->user()->password;
                 $validated = $request->validated();
                 $validated['password'] = Hash::make('password');
                 $user->update($validated);
                 return new UserResource($user);
+            }else if($is_admin){
+                if($user->is_super_admin != 1 and $user->is_admin != 1){
+                    $request['is_admin'] = 'required';
+                    $password = auth('sanctum')->user()->password;
+                    $validated = $request->validated();
+                    $validated['password'] = Hash::make('password');
+                    $user->update($validated);
+                    return new UserResource($user);
+                }
             }else{
                 if(auth('sanctum')->user()->id == $user->id){
                     $password = auth('sanctum')->user()->password;
@@ -188,7 +197,7 @@ class UserController extends Controller
     public function updateAvatar(UpdateAvatarRequest $request , User $user){
         $is_super_admin = Auth::user()->is_super_admin;
         $is_admin = Auth::user()->is_admin;
-        if($is_super_admin or $is_admin){
+        if($is_super_admin){
             $validated = $request->validated();
             $filName = time().$request->file('avatar')->getClientOriginalName();
             $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
@@ -197,6 +206,28 @@ class UserController extends Controller
             $validated ["avatar"] = '/storage/'. $path;
             $user->avatar = $validated['avatar'];
             $user->update();
+        }else if($is_admin){
+            if($user->id == Auth::user()->id){
+                $validated = $request->validated();
+                $filName = time().$request->file('avatar')->getClientOriginalName();
+                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                $oldAvatar = $user->avatar;
+                Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                $validated ["avatar"] = '/storage/'. $path;
+                $user->avatar = $validated['avatar'];
+                $user->update();
+            }else if($user->is_super_admin == 0 and $user->is_admin == 0){
+                $validated = $request->validated();
+                $filName = time().$request->file('avatar')->getClientOriginalName();
+                $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+                $oldAvatar = $user->avatar;
+                Storage::delete(str_replace("/storage/" , "public/" , $oldAvatar));
+                $validated ["avatar"] = '/storage/'. $path;
+                $user->avatar = $validated['avatar'];
+                $user->update();
+            }else{
+                abort(403 , "You can't edit other admins and super_admin's avatar!");
+            }
         }else{
             if(Auth::user()->id == $user-> id){
                 $validated = $request->validated();
