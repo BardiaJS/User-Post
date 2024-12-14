@@ -6,7 +6,8 @@ use Response;
 use Carbon\Carbon;
 use App\Models\User;
 use Tests\Unit\UserTest;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\URL;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
@@ -25,31 +26,51 @@ class UserController extends Controller
 {
     // function for register the user
 
-    public function register(UserStoreRequest $request){
+    public function register(Request $request){
         $token= request()->bearerToken();
         // if user has bearer token it means he logged in
-        if($token){
-            $is_super_admin = auth('sanctum')->user()->is_super_admin;
-            $is_admin = auth('sanctum')->user()->is_admin;
+        if(Auth::check()){
+            $is_super_admin = Auth::user()->is_super_admin;
+            $is_admin = Auth::user()->is_admin;
             if($is_super_admin == true){
-                // $request['is_admin'] = 'required';
-                $validated = $request->validated();
+                $validated = $request->validate([
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'password' =>'required|min:6',
+                    'is_admin' => 'required|boolean'
+                ]);
                 $user = User::create($validated);
-                return new UserResource($user);
+                return view('test');
             }else if($is_admin){
-                $validated = $request->validated();
+                $validated = $request->validate([
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'password' =>'required|min:6',
+                    'is_admin' => 'sometimes'
+                ]);
                 $validated['is_admin'] = false;
                 $user = User::create($validated);
-                return new UserResource($user);
+                return view('test');
             }else{
-                abort (403 , "You don't have an access");
+                return view('test');
             }
         }else{
-
-                $validated = $request->validated();
+                $validated = $request->validate([
+                    'first_name' => 'required|max:10' ,
+                    'last_name' => 'required|max:10' ,
+                    'display_name' =>'required|max:10' ,
+                    'email' => 'required|email|unique:users,email' ,
+                    'password' =>'required|min:6',
+                    'is_admin' => 'sometimes'
+                ]);
                 $validated['is_admin'] = false;
                 $user = User::create($validated);
-                return new UserResource($user);
+                // new UserResource($user);
+                return view('test');
         }
 
 

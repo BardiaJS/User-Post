@@ -24,7 +24,7 @@ class UserStoreRequest extends FormRequest
     {
         $token= request()->bearerToken();
         if($token){
-            if(auth('sanctum')->user()->is_super_admin == 0 ){
+            if((auth('sanctum')->user()->is_super_admin == false )){
                 return [
                     'first_name' => 'required|max:10' ,
                     'last_name' => 'required|max:10' ,
@@ -40,7 +40,7 @@ class UserStoreRequest extends FormRequest
                     'display_name' =>'required|max:10' ,
                     'email' => 'required|email|unique:users,email' ,
                     'password' =>'required|min:6',
-                    'is_admin' => 'required|boolean|in:true,false'
+                    'is_admin' => 'required|boolean'
                 ];
             }
         }else{
