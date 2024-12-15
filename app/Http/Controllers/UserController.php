@@ -42,7 +42,7 @@ class UserController extends Controller
                     'is_admin' => 'required|boolean'
                 ]);
                 $user = User::create($validated);
-                return view('test');
+                return redirect('/api/login-page');
             }else if($is_admin){
                 $validated = $request->validate([
                     'first_name' => 'required|max:10' ,
@@ -54,9 +54,9 @@ class UserController extends Controller
                 ]);
                 $validated['is_admin'] = false;
                 $user = User::create($validated);
-                return view('test');
+                return redirect('/api/login-page');
             }else{
-                return view('test');
+                return redirect('/api/login-page');
             }
         }else{
                 $validated = $request->validate([
@@ -70,7 +70,7 @@ class UserController extends Controller
                 $validated['is_admin'] = false;
                 $user = User::create($validated);
                 // new UserResource($user);
-                return view('test');
+                return redirect('/api/login-page');
         }
 
 
@@ -113,17 +113,13 @@ class UserController extends Controller
     public function login(UserLoginRequest $request){
         $validated = $request->validated();
         if(! Auth::attempt($validated)){
-            return response()->json([
-                'message' => 'login information is incorrect!'
-            ] , 401)  ;
+            return redirect('/api/login-page');
         }
             $user = User::where('email', $validated['email'])->first();
             $user->last_entry = Carbon::now()->toDateString();
             $user->save();
-            return response()->json([
-                'access_token' => $user->createToken('api_token')->plainTextToken ,
-                'type_token' => 'Bearer'
-            ]) ;
+            $token = $user->createToken('api_token')->plainTextToken;
+            return view('test' , ['token' => $token]);
 
     }
 
@@ -171,6 +167,8 @@ class UserController extends Controller
 
     //show the profile
     public function profile(){
+        $token
+        if()
             $user = Auth::user();
             if((bool)$user == true){
                 return new UserResource( $user );
