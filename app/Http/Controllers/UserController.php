@@ -29,9 +29,9 @@ class UserController extends Controller
     public function register(Request $request){
         $token= request()->bearerToken();
         // if user has bearer token it means he logged in
-        if(Auth::check()){
-            $is_super_admin = Auth::user()->is_super_admin;
-            $is_admin = Auth::user()->is_admin;
+        if($token){
+            $is_super_admin = auth('sanctum')->user()->is_super_admin;
+            $is_admin = auth('sanctum')->user()->is_admin;
             if($is_super_admin == true){
                 $validated = $request->validate([
                     'first_name' => 'required|max:10' ,
