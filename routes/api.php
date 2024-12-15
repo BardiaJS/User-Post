@@ -25,24 +25,31 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // user related routes
 //show the first page
 Route::get('/', function () {
-    return view('register-page');
-});
+    return view('user.register-page');
+})->name('login');
 
-// register endpoint
+// register form endpoint
 Route::post('/register' , [UserController::class , 'register']);
-
-Route::get('/login-page', function () {
-    return view('login-page');
+//avatar-add from
+Route::get("/add-avatar-page" , function(){
+    return view('user.add-avatar-page');
+})->middleware('auth:sanctum');
+//add avatar endpoint
+Route::post('/user/add-avatar' , [UserController::class , 'addAvatar'])->middleware('auth:sanctum');
+Route::get('/login', function () {
+    return view('user.login-page');
 });
 // login endpoint
 Route::post('/login' , [UserController::class,'login']);
+// show the welcome page
+Route::get("/store/post/{user}" , function(){
+    return view('post.store-page');
+})->middleware('auth:sanctum');
 // show the profile of the user
 Route::get('users/me' , [UserController::class,'profile'])->middleware('auth:sanctum');
 // change password endpoint
 Route::post('users/change-password/{user}' , [UserController::class,'changePassword'])->middleware('auth:sanctum');
 
-//add avatar endpoint
-Route::post('users/add-avatar/{user}' , [UserController::class , 'addAvatar'])->middleware('auth:sanctum');
 // change avatar
 Route::post('users/change-avatar/{user}' , [UserController::class , 'updateAvatar'])->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->group(function () {

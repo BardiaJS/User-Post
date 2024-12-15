@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use Response;
 use Carbon\Carbon;
 use App\Models\User;
-use Tests\Unit\UserTest;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\URL;
+
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,100 +23,99 @@ class UserController extends Controller
 {
     // function for register the user
 
-    public function register(Request $request){
+    public function register(UserStoreRequest $request){
         $token= request()->bearerToken();
         // if user has bearer token it means he logged in
         if($token){
             $is_super_admin = auth('sanctum')->user()->is_super_admin;
             $is_admin = auth('sanctum')->user()->is_admin;
             if($is_super_admin == true){
-                $validated = $request->validate([
-                    'first_name' => 'required|max:10' ,
-                    'last_name' => 'required|max:10' ,
-                    'display_name' =>'required|max:10' ,
-                    'email' => 'required|email|unique:users,email' ,
-                    'password' =>'required|min:6',
-                    'is_admin' => 'required|boolean'
-                ]);
-                $user = User::create($validated);
-                return redirect('/api/login-page');
+                $validated = $request->validated();
+                User::create($validated);
+                return redirect("/api/login");
             }else if($is_admin){
-                $validated = $request->validate([
-                    'first_name' => 'required|max:10' ,
-                    'last_name' => 'required|max:10' ,
-                    'display_name' =>'required|max:10' ,
-                    'email' => 'required|email|unique:users,email' ,
-                    'password' =>'required|min:6',
-                    'is_admin' => 'sometimes'
-                ]);
+                $validated = $request->validated();
                 $validated['is_admin'] = false;
-                $user = User::create($validated);
-                return redirect('/api/login-page');
+                User::create($validated);
+                return redirect("/api/login");
             }else{
-                return redirect('/api/login-page');
+                return redirect("/api/login");
             }
         }else{
-                $validated = $request->validate([
-                    'first_name' => 'required|max:10' ,
-                    'last_name' => 'required|max:10' ,
-                    'display_name' =>'required|max:10' ,
-                    'email' => 'required|email|unique:users,email' ,
-                    'password' =>'required|min:6',
-                    'is_admin' => 'sometimes'
-                ]);
+                $validated = $request->validated();
                 $validated['is_admin'] = false;
-                $user = User::create($validated);
+                User::create($validated);
                 // new UserResource($user);
-                return redirect('/api/login-page');
+                return redirect("/api/login");
         }
 
 
     }
 
     // function for add the avatar
-    public function addAvatar(AddAvatarRequest $addAvatarRequest , User $user){
-        if(Auth::user()->is_super_admin == true){
-            $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
-            $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
-            $requestData ["avatar"] = '/storage/'. $path;
-            $validated = $addAvatarRequest->validated();
-            $validated['avatar'] = $requestData["avatar"];
-            $user -> update($validated);
-            return new UserResource($user);
-        }else if (Auth::user()->is_admin == true){
-            $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
-            $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
-            $requestData ["avatar"] = '/storage/'. $path;
-            $validated = $addAvatarRequest->validated();
-            $validated['avatar'] = $requestData["avatar"];
-            $user -> update($validated);
-            return new UserResource($user);
-        }else{
-            if(Auth::user()->id == $user->id){
-                $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
-                $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
-                $requestData ["avatar"] = '/storage/'. $path;
-                $validated = $addAvatarRequest->validated();
-                $validated['avatar'] = $requestData["avatar"];
-                $user -> update($validated);
-                return new UserResource($user);
-            }else{
-                abort(403 , "You can't set a profile to other users!");
-            }
-        }
-    }
+    // public function addAvatar(AddAvatarRequest $request , User $user){
+    //     $token= request()->bearerToken();
+    //     if($token){
+    //         if(auth('sanctum')->user()->is_super_admin == true){
+    //             $validated = $request->validated();
+    //             $filName = time().$request->file('avatar')->getClientOriginalName();
+    //             $path = $request->file('avatar')->storeAs('avatars' , $filName , 'public');
+    //             $validated ["avatar"] = '/storage/'. $path;
+    //             $user->avatar = $validated['avatar'];
+    //             $user->save();
+    //             return  redirect('/api/login');
+    //         }else if (auth('sanctum')->user()->is_admin == true){
+    //             $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+    //             $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+    //             $requestData ["avatar"] = '/storage/'. $path;
+    //             $validated = $addAvatarRequest->validated();
+    //             $validated['avatar'] = $requestData["avatar"];
+    //             $user -> update($validated);
+    //             return  redirect('/api/login');
+    //         }else{
+    //             if(auth('sanctum')->user()->id == $user->id){
+    //                 $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+    //                 $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+    //                 $requestData ["avatar"] = '/storage/'. $path;
+    //                 $validated = $addAvatarRequest->validated();
+    //                 $validated['avatar'] = $requestData["avatar"];
+    //                 $user -> update($validated);
+    //                 return  redirect('/api/login');
+    //             }else{
+    //                 abort(403 , "You can't set a profile to other users!");
+    //             }
+    //         }
+    //     }else{
+    //         $filName = time().$addAvatarRequest->file('avatar')->getClientOriginalName();
+    //         $path = $addAvatarRequest->file('avatar')->storeAs('avatars' , $filName , 'public');
+    //         $requestData ["avatar"] = '/storage/'. $path;
+    //         $validated = $addAvatarRequest->validated();
+    //         $validated['avatar'] = $requestData["avatar"];
+    //         $user -> update($validated);
+    //         return  redirect('/api/login');
+    //     }
+
+    // }
 
     // function fore login the user
     public function login(UserLoginRequest $request){
         $validated = $request->validated();
-        if(! Auth::attempt($validated)){
+        if(!auth()->attempt($validated)){
             return redirect('/api/login-page');
-        }
+        }else{
+            // $request->session()->regenerate();
             $user = User::where('email', $validated['email'])->first();
             $user->last_entry = Carbon::now()->toDateString();
             $user->save();
-            $token = $user->createToken('api_token')->plainTextToken;
-            return view('test' , ['token' => $token]);
+            // $token = $user->createToken('api_token')->plainTextToken;
+            return view('user.welcome-page');
+        }
+
+
+
+
+
+
 
     }
 
@@ -165,16 +161,16 @@ class UserController extends Controller
             }
     }
 
-    //show the profile
-    public function profile(){
-        $token
-        if()
-            $user = Auth::user();
-            if((bool)$user == true){
-                return new UserResource( $user );
-            }
-            abort(403 , "no founding the user");
-    }
+    // //show the profile
+    // public function profile(){
+    //     $token
+    //     if()
+    //         $user = Auth::user();
+    //         if((bool)$user == true){
+    //             return new UserResource( $user );
+    //         }
+    //         abort(403 , "no founding the user");
+    // }
 
     public function changePassword(UserPasswordUpdateRequest $request , User $user){
 

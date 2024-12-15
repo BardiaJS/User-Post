@@ -1,20 +1,20 @@
-<x-layout>
+<x-login-used>
     <div class="container py-md-5">
         <div class="row align-items-center">
           <div class="col-lg-7 py-3 py-md-5">
-            <img src="images/1600682639793.gif">
+            <img src="register.png">
           </div>
           <div class="col-lg-5 pl-lg-5 pb-3 py-lg-5">
             <form action="/api/register" method="POST" id="registration-form">
               @csrf
               <div class="form-group">
-                <label for="username-register" class="text-muted mb-1"><small>First Name</small></label>
-                <input value="{{old('first_name')}}" name="first_name" id="username-register" class="form-control" type="text" placeholder="Enter first name" autocomplete="off" />
+                <label for="username-register" class="text-muted mb-1"><small>Name</small></label>
+                <input value="{{old('name')}}" name="name" id="username-register" class="form-control" type="text" placeholder="Enter first name" autocomplete="off" />
               </div>
 
               <div class="form-group">
-                <label for="username-register" class="text-muted mb-1"><small>Last Name</small></label>
-                <input value="{{old('last_name')}}" name="last_name" id="username-register" class="form-control" type="text" placeholder="Enter last name" autocomplete="off" />
+                <label for="username-register" class="text-muted mb-1"><small>Content</small></label>
+                <input value="{{old('content')}}" name="content" id="username-register" class="form-control" type="text" placeholder="Enter last name" autocomplete="off" />
               </div>
 
               <div class="form-group">
@@ -41,5 +41,4 @@
           </div>
         </div>
       </div>
-
-</x-layout>
+</x-login-used>

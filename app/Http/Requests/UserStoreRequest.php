@@ -24,14 +24,14 @@ class UserStoreRequest extends FormRequest
     {
         $token= request()->bearerToken();
         if($token){
-            if((auth('sanctum')->user()->is_super_admin == false )){
+            if((auth('sanctum')->user()->is_super_admin == true )){
                 return [
                     'first_name' => 'required|max:10' ,
                     'last_name' => 'required|max:10' ,
                     'display_name' =>'required|max:10' ,
                     'email' => 'required|email|unique:users,email' ,
                     'password' =>'required|min:6',
-                    'is_admin' => 'sometimes|boolean'
+                    'is_admin' => 'required|boolean'
                 ];
             }else{
                 return [
@@ -40,7 +40,7 @@ class UserStoreRequest extends FormRequest
                     'display_name' =>'required|max:10' ,
                     'email' => 'required|email|unique:users,email' ,
                     'password' =>'required|min:6',
-                    'is_admin' => 'required|boolean'
+                    'is_admin' => 'sometimes'
                 ];
             }
         }else{
@@ -50,7 +50,7 @@ class UserStoreRequest extends FormRequest
                 'display_name' =>'required|max:10' ,
                 'email' => 'required|email|unique:users,email' ,
                 'password' =>'required|min:6',
-                'is_admin' => 'sometimes|boolean'
+                'is_admin' => 'sometimes'
             ];
         }
 

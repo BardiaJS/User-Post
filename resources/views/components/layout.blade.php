@@ -25,30 +25,21 @@
         <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">Candi Vote</a></h4>
         @auth
         <div class="flex-row my-3 my-md-0">
-          <form action="/search">
-            <div class="relative border-2 border-gray-100 m-4 rounded-lg">
-              <div class="absolute top-4 left-3">
-                <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500" style="color: white"></i>
-                <input type="text" name="search" class="h-14 w-full pl-10 pr-20 rounded-lg z-0 focus:shadow focus:outline-none"placeholder="Search"/>
-                <button class="btn btn-primary btn-sm" type="submit">Search</button>
-              </div>
-            </div>
-          </form>
 
-          <a href="/candidate-list-page" class="text-white mr-2 header-search-icon" title="Vote" data-toggle="tooltip" data-placement="bottom"><i class="bi bi-check2-circle"></i></a>
           <a href="/profile/{{auth()->user()->id}}" class="mr-2"><i class="bi bi-person-circle" style="color: white"></i></a>
-          @if (auth()->user()->isCandidate == 0)
-          <a class="btn btn-sm btn-success mr-2" href="/candidate-info">President Page</a>
-          @else
-          <a class="btn btn-sm btn-success mr-2 disabled">You are in president list</a>
+          @if ((auth('sanctum')->user()->is_admin == true) or (auth('sanctum')->user()->is_super_admin == true))
+          <a class="btn btn-sm btn-success mr-2" href="/candidate-info">Add User</a>
           @endif
+          <a href="/api" class="btn btn-sm btn-success mr-2 " style="color: black">Profile</a>
+          <a href="/api/store/post/{{auth('sanctum')->user()->id}}" class="btn btn-sm btn-success mr-2 " style="color: black">Add Post</a>
+          <a class="btn btn-sm btn-success mr-2 " style="color: black">Change Password</a>
           <form action="/signout-user" method="POST" class="d-inline">
             @csrf
             <button class="btn btn-sm btn-secondary">Sign Out</button>
           </form>
         </div>
           @else
-          <form action="/login" method="GET" class="mb-0 pt-2 pt-md-0">
+          <form action="/api/login" method="GET" class="mb-0 pt-2 pt-md-0">
             @csrf
             <div class="row align-items-center">
                 <div class="col-md-auto">
