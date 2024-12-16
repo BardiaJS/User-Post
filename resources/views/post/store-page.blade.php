@@ -3,7 +3,7 @@
         <div class="row align-items-center">
 
           <div class="col-lg-5 pl-lg-5 pb-3 py-lg-5">
-            <form action="/store/post/{{auth()->user()->id}}" method="POST" id="registration-form">
+            <form action="/add-thumbnail-post/{{$post->id}}" method="POST" id="registration-form">
               @csrf
               <div class="form-group">
                 <label for="username-register" class="text-muted mb-1"><small>Name</small></label>

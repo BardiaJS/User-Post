@@ -22,7 +22,7 @@ class AddThumbnailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'avatar' => 'required|image|max:3000'
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
     }
 }

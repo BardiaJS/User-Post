@@ -26,7 +26,7 @@ Route::post('/register' , [UserController::class , 'register']);
 //route for get the login form
 Route::get('/login' , function(){
     return view('user.login-page');
-})->middleware('login');
+})->name('login');
 // route for pass the information for login
 Route::post('/login' , [UserController::class , 'login']);
 
@@ -46,9 +46,11 @@ Route::get('/store-post-page/{user}' , function(){
 Route::post('/store/post/{user}' , [PostController::class , 'store'])->middleware('auth');
 
 // route for get the add thumbnail form
-Route::get('/add-thumbnail-past/{user}' , function(){
-    return view('test');
+Route::get('/add-thumbnail-post/{post}' , function(){
+    return view('post.store-page');
 });
+// route for set the thumbnail
+Route::post('/add-thumbnail/post/{post}' , [PostController::class , 'addThumbnail']);
 
 //route for get the change password form
 Route::get('/change-password-page' , function(){
@@ -56,3 +58,5 @@ Route::get('/change-password-page' , function(){
 });
 //route for change the password
 Route::post('/change-password/{user}' , [UserController::class,'changePassword'])->middleware('auth');
+
+// route for get the all users
