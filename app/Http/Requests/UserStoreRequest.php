@@ -22,9 +22,9 @@ class UserStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        $token= request()->bearerToken();
-        if($token){
-            if((auth('sanctum')->user()->is_super_admin == true )){
+        $is_login = Auth::check();
+        if($is_login){
+            if(Auth::user()->is_super_admin == true){
                 return [
                     'first_name' => 'required|max:10' ,
                     'last_name' => 'required|max:10' ,

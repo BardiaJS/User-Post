@@ -22,24 +22,29 @@
   <body>
     <header class="header-bar mb-3">
       <div class="container d-flex flex-column flex-md-row align-items-center p-3">
+
+
+
         <h4 class="my-0 mr-md-auto font-weight-normal"><a href="/" class="text-white">Candi Vote</a></h4>
-        @auth
+        @if(auth()->user())
         <div class="flex-row my-3 my-md-0">
 
           <a href="/profile/{{auth()->user()->id}}" class="mr-2"><i class="bi bi-person-circle" style="color: white"></i></a>
-          @if ((auth('sanctum')->user()->is_admin == true) or (auth('sanctum')->user()->is_super_admin == true))
-          <a class="btn btn-sm btn-success mr-2" href="/candidate-info">Add User</a>
+
+          @if ((auth()->user()->is_super_admin==true) or (auth()->user()->is_admin == true))
+          <a href="/" class="btn btn-sm btn-success mr-2" href="/candidate-info">Add User</a>
+          <a href="/" class="btn btn-sm btn-success mr-2" href="/candidate-info">Users</a>
           @endif
-          <a href="/api" class="btn btn-sm btn-success mr-2 " style="color: black">Profile</a>
-          <a href="/api/store/post/{{auth('sanctum')->user()->id}}" class="btn btn-sm btn-success mr-2 " style="color: black">Add Post</a>
-          <a class="btn btn-sm btn-success mr-2 " style="color: black">Change Password</a>
-          <form action="/signout-user" method="POST" class="d-inline">
+          <a href="/" class="btn btn-sm btn-success mr-2 " style="color: black">Profile</a>
+          <a href="/store-post-page/{{auth()->user()->id}}" class="btn btn-sm btn-success mr-2 " style="color: black">Add Post</a>
+          <a href="/change-password-page" class="btn btn-sm btn-success mr-2 " style="color: black">Change Password</a>
+          <form action="/signout" method="POST" class="d-inline">
             @csrf
             <button class="btn btn-sm btn-secondary">Sign Out</button>
           </form>
         </div>
           @else
-          <form action="/api/login" method="GET" class="mb-0 pt-2 pt-md-0">
+          <form action="/login" method="GET" class="mb-0 pt-2 pt-md-0">
             @csrf
             <div class="row align-items-center">
                 <div class="col-md-auto">
@@ -47,7 +52,7 @@
                 </div>
             </div>
           </form>
-        @endauth
+        @endif
 
       </div>
     </header>

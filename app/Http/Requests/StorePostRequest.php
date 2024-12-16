@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
@@ -21,11 +22,12 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $id = Auth::user()->id;
         return [
             'name' => 'required|max:10' ,
             'content' => 'required' ,
             'tags' => 'required' ,
-            'is_visible' => 'required'
+            'is_visible' => 'required',
         ];
     }
 }

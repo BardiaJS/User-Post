@@ -1,5 +1,6 @@
 <x-login-used>
-        <form action="/api" method="GET" class="mb-0 pt-2 pt-md-0">
+        <form action="/signout" method="POST" class="mb-0 pt-2 pt-md-0">
+            @csrf
             <div class="col-md-auto">
                 <button class="btn btn-primary btn-sm" style="margin-bottom: 50px">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-backspace-fill" viewBox="0 0 16 16">
@@ -8,7 +9,7 @@
                     Back</button>
             </div>
         </form>
-    <form action="/api/login" method="POST" class="mb-0 pt-2 pt-md-0">
+    <form action="/login" method="POST" class="mb-0 pt-2 pt-md-0">
         @csrf
         <div class="row align-items-center">
           <div class="col-md mr-0 pr-md-0 mb-3 mb-md-0">

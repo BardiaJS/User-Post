@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->boolean('is_visible')->default(true);
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->references('id')->on('users');
         });
     }
 
